@@ -7,18 +7,32 @@ function Keypad() {
   const [hasStarted, setHasStarted] = useState(false);
   const [speed, setSpeed] = useState(null);
   const keyCountRef = useRef(0);
-  const [time, setTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef(null);
 
   function handleTyping() {
-    keyCountRef += 1;
+    keyCountRef.current += 1;
     if (!hasStarted) {
       setHasStarted(true);
+      timerRef.current = setTimeout(() => {
+        let text = document.getElementById("keypad-entry");
+        text.disabled = true;
+        const totalKeys = keyCountRef.current;
+        const kps = totalKeys / 5;
+        setSpeed(kps.toFixed(2));
+      }, 5000);
     }
   }
 
-  function stopWatch() {}
+  function handleClick() {
+    setHasStarted(false);
+    setSpeed(null);
+    keyCountRef.current = 0;
+    timerRef.current = null;
+    let text = document.getElementById("keypad-entry");
+    text.value = "";
+    text.disabled = false;
+  }
+
   return (
     <div className="keypad">
       <label for="keypad-entry">Enter the above text here:</label>
@@ -30,6 +44,11 @@ function Keypad() {
         cols={90}
         onKeyDown={handleTyping}
       ></textarea>
+      {speed != null && <p>{speed} characters per second</p>}
+
+      <button onClick={handleClick} className="reset-btn">
+        Reset
+      </button>
     </div>
   );
 }
